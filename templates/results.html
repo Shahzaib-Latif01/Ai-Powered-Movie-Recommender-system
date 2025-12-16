@@ -1,0 +1,511 @@
+<!-- templates/results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendation Results | Intelligent Netflix Recommender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --netflix-red: #E50914;
+            --netflix-red-hover: #B20710;
+            --netflix-dark: #141414;
+            --netflix-gray: #282828;
+            --netflix-light-gray: #6D6D6E;
+        }
+
+        body {
+            background-color: var(--netflix-dark);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            color: var(--netflix-red);
+            letter-spacing: 1px;
+        }
+
+        /* Enhanced Card Styles */
+.recommendation-card {
+    background: linear-gradient(145deg, #323232, #262626);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 30px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.recommendation-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 15px 30px rgba(229, 9, 20, 0.2);
+    border-color: rgba(229, 9, 20, 0.3);
+}
+
+.card-img-top {
+    height: 200px;
+    position: relative;
+    overflow: hidden;
+    background: linear-gradient(135deg, #000000, #1a1a1a);
+}
+
+.card-img-top::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(to bottom, 
+        rgba(0, 0, 0, 0.1) 0%, 
+        rgba(0, 0, 0, 0.5) 50%, 
+        rgba(0, 0, 0, 0.8) 100%);
+    z-index: 1;
+}
+
+.card-img-top .placeholder-icon {
+    font-size: 3.5rem;
+    color: var(--netflix-red);
+    z-index: 2;
+    filter: drop-shadow(0 0 8px rgba(229, 9, 20, 0.6));
+    opacity: 0.9;
+    transition: all 0.3s ease;
+}
+
+.recommendation-card:hover .placeholder-icon {
+    transform: scale(1.1);
+    opacity: 1;
+}
+
+.card-img-top .title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px 15px;
+    z-index: 2;
+    text-align: center;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0) 100%);
+    transform: translateY(5px);
+    transition: transform 0.3s ease;
+}
+
+.recommendation-card:hover .title-overlay {
+    transform: translateY(0);
+}
+
+.card-img-top .title-overlay h5 {
+    margin: 0;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card-body {
+    padding: 25px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    background: linear-gradient(to bottom, rgba(40, 40, 40, 0.9), rgba(30, 30, 30, 0.9));
+}
+
+.card-body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(to right, transparent, rgba(255, 255, 255, 0.1), transparent);
+}
+
+.card-title {
+    font-weight: 700;
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+    line-height: 1.3;
+    color: #fff;
+    position: relative;
+    padding-bottom: 12px;
+}
+
+.card-title::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 40px;
+    height: 3px;
+    background-color: var(--netflix-red);
+    border-radius: 3px;
+}
+
+.card-badges {
+    display: flex;
+    flex-wrap: wrap;
+    margin-bottom: 15px;
+    gap: 8px;
+}
+
+.card-badge {
+    display: inline-block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 5px 10px;
+    border-radius: 20px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.badge-type {
+    background-color: var(--netflix-red);
+    box-shadow: 0 2px 4px rgba(229, 9, 20, 0.3);
+}
+
+.badge-year {
+    background-color: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-info {
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.card-info strong {
+    color: #fff;
+    font-weight: 600;
+    display: inline-block;
+    margin-right: 5px;
+}
+
+.card-info span {
+    color: var(--netflix-light-gray);
+}
+
+.card-text {
+    color: #B3B3B3;
+    font-size: 0.9rem;
+    line-height: 1.6;
+    margin-bottom: 20px;
+    flex-grow: 1;
+}
+
+.truncate-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Enhanced No Results UI */
+.no-results {
+    background: linear-gradient(145deg, #323232, #262626);
+    border-radius: 15px;
+    padding: 50px;
+    text-align: center;
+    margin: 40px 0;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.no-results i {
+    font-size: 5rem;
+    color: var(--netflix-red);
+    margin-bottom: 25px;
+    opacity: 0.9;
+    filter: drop-shadow(0 0 10px rgba(229, 9, 20, 0.4));
+}
+
+.no-results h3 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.no-results p {
+    font-size: 1.1rem;
+    color: #B3B3B3;
+    max-width: 500px;
+    margin: 0 auto 25px;
+}
+
+/* Enhanced Header Section */
+.results-header {
+    background-image: linear-gradient(to bottom, 
+        rgba(20, 20, 20, 0.9), 
+        rgba(20, 20, 20, 0.95)), 
+        url('https://assets.nflxext.com/ffe/siteui/vlv3/ab4b0b22-2ddf-4d48-ae88-c201ae0267e2/0efe6360-7c16-459a-98c4-87ce25b1a27d/US-en-20231030-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+    background-size: cover;
+    background-position: center;
+    padding: 80px 0;
+    position: relative;
+    box-shadow: 0 5px 25px rgba(0, 0, 0, 0.5);
+}
+
+.results-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100px;
+    background: linear-gradient(to bottom, rgba(0, 0, 0, 0.7), transparent);
+}
+
+.results-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 3.2rem;
+    margin-bottom: 15px;
+    text-shadow: 0 3px 6px rgba(0, 0, 0, 0.5);
+    letter-spacing: 1px;
+}
+
+.recommendation-type {
+    color: var(--netflix-red);
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(229, 9, 20, 0.4);
+}
+
+.results-header .lead {
+    font-size: 1.3rem;
+    font-weight: 300;
+    color: #B3B3B3;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+/* Back button enhancement */
+.btn-netflix {
+    background: linear-gradient(to right, #E50914, #B20710);
+    border: none;
+    color: white;
+    padding: 14px 28px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border-radius: 5px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(229, 9, 20, 0.3);
+}
+
+.btn-netflix:hover {
+    background: linear-gradient(to right, #F50914, #C20710);
+    color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(229, 9, 20, 0.4);
+}
+
+.btn-netflix:active {
+    transform: translateY(-1px);
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 767px) {
+    .results-title {
+        font-size: 2.5rem;
+    }
+    
+    .results-header {
+        padding: 60px 0;
+    }
+    
+    .card-img-top {
+        height: 180px;
+    }
+}
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">NETRECOMMEND</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/analytics">Analytics</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">About</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Results Header -->
+    <section class="results-header">
+        <div class="container">
+            <div class="text-center">
+                {% if recommendation_type == 'similar' %}
+                    <h1 class="results-title">Shows similar to <span class="recommendation-type">"{{ query }}"</span></h1>
+                    <p class="lead">Based on content, genre, and themes</p>
+                {% elif recommendation_type == 'genre' %}
+                    <h1 class="results-title">Top shows in <span class="recommendation-type">"{{ query }}"</span></h1>
+                    <p class="lead">The best Netflix content in this genre</p>
+                {% elif recommendation_type == 'actor' %}
+                    <h1 class="results-title">Shows featuring <span class="recommendation-type">"{{ query }}"</span></h1>
+                    <p class="lead">Great performances you might enjoy</p>
+                {% elif recommendation_type == 'collaborative' %}
+                    <h1 class="results-title">Collaborative Filtering for <span class="recommendation-type">{{ query }}</span></h1>
+                    <p class="lead">Personalized recommendations based on user behavior patterns</p>
+                {% elif recommendation_type == 'hybrid' %}
+                    <h1 class="results-title">Hybrid AI Recommendations for <span class="recommendation-type">{{ query }}</span></h1>
+                    <p class="lead">Advanced AI combining multiple recommendation strategies</p>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+
+    <!-- Results Content -->
+    <div class="container mt-5">
+        {% if not recommendations %}
+            <div class="no-results">
+                <i class="fas fa-search"></i>
+                <h3>No recommendations found</h3>
+                <p>We couldn't find any matching recommendations. Try a different query.</p>
+                <a href="/" class="btn btn-netflix mt-3">
+                    <i class="fas fa-arrow-left me-2"></i> Try Again
+                </a>
+            </div>
+        {% else %}
+            <div class="row">
+                {% for rec in recommendations %}
+                    <div class="col-md-4 col-lg-3 mb-4">
+                        <div class="recommendation-card">
+                            <!-- <div class="card-img-top">
+                                {% if rec.type == 'Movie' %}
+                                    <i class="fas fa-film placeholder-icon"></i>
+                                {% else %}
+                                    <i class="fas fa-tv placeholder-icon"></i>
+                                {% endif %}
+                                <div class="title-overlay">
+                                    <h5>{{ rec.title }}</h5>
+                                </div>
+                            </div> -->
+                            <div class="card-body">
+                                <h5 class="card-title">{{ rec.title }}</h5>
+                                <div class="card-badges">
+                                    <span class="card-badge badge-type">{{ rec.type }}</span>
+                                    <span class="card-badge badge-year">{{ rec.release_year }}</span>
+                                    {% if recommendation_type == 'collaborative' and rec.predicted_rating %}
+                                        <span class="card-badge" style="background-color: #28a745;">
+                                            <i class="fas fa-star"></i> {{ rec.predicted_rating }}
+                                        </span>
+                                    {% elif recommendation_type == 'hybrid' and rec.hybrid_score %}
+                                        <span class="card-badge" style="background-color: #17a2b8;">
+                                            <i class="fas fa-magic"></i> {{ rec.hybrid_score }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                
+                                {% if recommendation_type == 'actor' %}
+                                    <div class="card-info">
+                                        <strong>Cast:</strong> <span>{{ rec.cast }}</span>
+                                    </div>
+                                {% endif %}
+                                
+                                <div class="card-info">
+                                    <strong>Genres:</strong> <span>{{ rec.listed_in }}</span>
+                                </div>
+                                
+                                {% if recommendation_type == 'collaborative' %}
+                                    <div class="card-info">
+                                        <strong>Predicted Rating:</strong> 
+                                        <span class="text-warning">
+                                            {% for i in range(1, 6) %}
+                                                {% if i <= rec.predicted_rating %}
+                                                    <i class="fas fa-star"></i>
+                                                {% elif i - 0.5 <= rec.predicted_rating %}
+                                                    <i class="fas fa-star-half-alt"></i>
+                                                {% else %}
+                                                    <i class="far fa-star"></i>
+                                                {% endif %}
+                                            {% endfor %}
+                                            ({{ rec.predicted_rating }}/5.0)
+                                        </span>
+                                    </div>
+                                {% elif recommendation_type == 'hybrid' %}
+                                    <div class="card-info">
+                                        <strong>AI Confidence:</strong> 
+                                        <span class="text-info">
+                                            {% set confidence_percent = (rec.hybrid_score * 100) | round(1) %}
+                                            <div class="progress mt-2" style="height: 8px;">
+                                                <div class="progress-bar bg-info" role="progressbar" 
+                                                     style="width: {{ confidence_percent }}%" 
+                                                     aria-valuenow="{{ confidence_percent }}" 
+                                                     aria-valuemin="0" aria-valuemax="100">
+                                                </div>
+                                            </div>
+                                            {{ confidence_percent }}% match
+                                        </span>
+                                    </div>
+                                {% endif %}
+                                
+                                {% if recommendation_type != 'actor' %}
+                                    <p class="card-text truncate-text">{{ rec.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-5 mb-5">
+            <a href="/" class="btn btn-netflix">
+                <i class="fas fa-home me-2"></i> Back to Recommendations
+            </a>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <p>&copy; 2025 Intelligent Netflix Recommender</p>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/analytics">Analytics</a></li>
+                        <li><a href="#about">About</a></li>
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                    <p class="small">Project by: Muhammad Hammad Alamgir & Shahzaib Latif</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

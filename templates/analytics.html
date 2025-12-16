@@ -1,0 +1,930 @@
+<!-- templates/analytics.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Netflix Content Analytics | Intelligent Netflix Recommender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --netflix-red: #E50914;
+            --netflix-red-hover: #B20710;
+            --netflix-dark: #141414;
+            --netflix-gray: #282828;
+            --netflix-light-gray: #6D6D6E;
+        }
+
+        body {
+            background-color: var(--netflix-dark);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            color: var(--netflix-red);
+            letter-spacing: 1px;
+        }
+
+        .analytics-header {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.8), var(--netflix-dark)), url('https://assets.nflxext.com/ffe/siteui/vlv3/ab4b0b22-2ddf-4d48-ae88-c201ae0267e2/0efe6360-7c16-459a-98c4-87ce25b1a27d/US-en-20231030-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 0;
+            margin-bottom: 50px;
+        }
+
+        .analytics-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .card {
+            background-color: var(--netflix-gray);
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+            height: 100%;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+        }
+
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+        }
+
+        .card-header i {
+            font-size: 1.5rem;
+            margin-right: 15px;
+            color: var(--netflix-red);
+        }
+
+        .card-header h5 {
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: 0 auto;
+            height: 350px;
+            width: 100%;
+        }
+
+        .insights-container {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .insight-item {
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #ffffff;
+        }
+
+        .insight-item i {
+            color: var(--netflix-red);
+            margin-right: 8px;
+        }
+
+        .btn-netflix {
+            background-color: var(--netflix-red);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-netflix:hover {
+            background-color: var(--netflix-red-hover);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 70px;
+            height: 3px;
+            background-color: var(--netflix-red);
+        }
+
+        .summary-card {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-radius: 8px;
+            padding: 30px;
+            margin-bottom: 50px;
+        }
+
+        .summary-stat {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(229, 9, 20, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            color: var(--netflix-red);
+            font-size: 1.5rem;
+        }
+
+        .stat-content h3 {
+            font-size: 2rem;
+            margin: 0;
+            font-weight: 700;
+        }
+
+        .stat-content p {
+            margin: 0;
+            color: var(--netflix-light-gray);
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 30px 0;
+            margin-top: 80px;
+            text-align: center;
+            color: var(--netflix-light-gray);
+        }
+
+        .footer-links {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-links li {
+            margin: 0 15px;
+        }
+
+        .footer-links a {
+            color: var(--netflix-light-gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .loading-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 350px;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(229, 9, 20, 0.1);
+            border-radius: 50%;
+            border-top: 5px solid var(--netflix-red);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">NETRECOMMEND</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/analytics">Analytics</a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Analytics Header -->
+    <section class="analytics-header">
+        <div class="container text-center">
+            <h1 class="analytics-title">Netflix Content Analytics</h1>
+            <p class="lead">Explore insights and visualizations about Netflix's content library</p>
+        </div>
+    </section>
+
+    <!-- Summary Stats Section -->
+    <section class="container mb-5">
+        <div class="summary-card">
+            <div class="row" id="summary-stats">
+                <div class="col-md-3">
+                    <div class="summary-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-film"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="total-content">...</h3>
+                            <p>Total Titles</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="movie-count">...</h3>
+                            <p>Movies</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-tv"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="tvshow-count">...</h3>
+                            <p>TV Shows</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="summary-stat">
+                        <div class="stat-icon">
+                            <i class="fas fa-globe-americas"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 id="country-count">...</h3>
+                            <p>Countries</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Content Distribution Section -->
+    <section class="container mb-5">
+        <h2 class="section-title">Content Analysis</h2>
+        
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header" style="color: white;">
+                        <i class="fas fa-chart-pie"></i>
+                        <h5>Content Type Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="content-type-container">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="insights-container">
+                            <div class="insight-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="content-type-insight">Loading insights...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header" style="color: white;">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h5>Content by Release Year</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="year-container">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="insights-container">
+                            <div class="insight-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="year-insight">Loading insights...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row">
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header" style="color: white;">
+                        <i class="fas fa-tags"></i>
+                        <h5>Top Genres</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="genre-container">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="insights-container">
+                            <div class="insight-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="genre-insight">Loading insights...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header" style="color: white;">
+                        <i class="fas fa-star"></i>
+                        <h5>Content Ratings Distribution</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" id="ratings-container">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="insights-container">
+                            <div class="insight-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="ratings-insight">Loading insights...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Geographic Distribution Section -->
+    <section class="container mb-5">
+        <h2 class="section-title">Geographic Distribution</h2>
+        
+        <div class="row">
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header" style="color: white;">
+                        <i class="fas fa-globe-americas"></i>
+                        <h5>Top Countries by Content Production</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container" style="height: 400px;" id="country-container">
+                            <div class="loading-container">
+                                <div class="spinner"></div>
+                            </div>
+                        </div>
+                        <div class="insights-container " >
+                            <div class="insight-item">
+                                <i class="fas fa-lightbulb"></i>
+                                <span id="country-insight">Loading insights...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recommendation Button -->
+    <div class="container text-center mb-5">
+        <a href="/" class="btn btn-netflix btn-lg">
+            <i class="fas fa-magic me-2"></i> Get Personalized Recommendations
+        </a>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                    <p>&copy; 2025 Intelligent Netflix Recommender</p>
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/analytics">Analytics</a></li>
+                       
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                    <p class="small">Project by: Muhammad Hammad Alamgir & Shahzaib Latif</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch analytics data
+            fetch('/api/analytics')
+                .then(response => response.json())
+                .then(data => {
+                    // Remove loading spinners
+                    document.querySelectorAll('.loading-container').forEach(container => {
+                        container.remove();
+                    });
+                    
+                    // Update summary stats
+                    updateSummaryStats(data);
+                    
+                    // Create charts
+                    createContentTypeChart('content-type-container', data.contentTypes);
+                    createYearChart('year-container', data.years);
+                    createGenreChart('genre-container', data.genres);
+                    createRatingsChart('ratings-container', data.ratings);
+                    createCountryChart('country-container', data.countries);
+                    
+                    // Generate insights
+                    generateInsights(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching analytics data:', error);
+                    document.querySelectorAll('.loading-container').forEach(container => {
+                        container.innerHTML = '<p class="text-danger">Error loading data. Please try again later.</p>';
+                    });
+                });
+        });
+        
+        // Update summary statistics
+        function updateSummaryStats(data) {
+            // Calculate total content
+            const totalContent = data.contentTypes.values.reduce((a, b) => a + b, 0);
+            document.getElementById('total-content').textContent = totalContent.toLocaleString();
+            
+            // Get movie count (assuming first item is 'Movie')
+            const movieIndex = data.contentTypes.labels.indexOf('Movie');
+            const movieCount = movieIndex !== -1 ? data.contentTypes.values[movieIndex] : 0;
+            document.getElementById('movie-count').textContent = movieCount.toLocaleString();
+            
+            // Get TV show count (assuming second item is 'TV Show')
+            const tvShowIndex = data.contentTypes.labels.indexOf('TV Show');
+            const tvShowCount = tvShowIndex !== -1 ? data.contentTypes.values[tvShowIndex] : 0;
+            document.getElementById('tvshow-count').textContent = tvShowCount.toLocaleString();
+            
+            // Get country count
+            const countryCount = data.countries.labels.length;
+            document.getElementById('country-count').textContent = countryCount.toLocaleString();
+        }
+        
+        // Generate insights based on the data
+        function generateInsights(data) {
+            // Content type insight
+            const movieIndex = data.contentTypes.labels.indexOf('Movie');
+            const tvShowIndex = data.contentTypes.labels.indexOf('TV Show');
+            
+            if (movieIndex !== -1 && tvShowIndex !== -1) {
+                const movieCount = data.contentTypes.values[movieIndex];
+                const tvShowCount = data.contentTypes.values[tvShowIndex];
+                const totalContent = movieCount + tvShowCount;
+                const moviePercentage = ((movieCount / totalContent) * 100).toFixed(1);
+                const tvShowPercentage = ((tvShowCount / totalContent) * 100).toFixed(1);
+                
+                document.getElementById('content-type-insight').textContent = 
+                    `Netflix's library is composed of ${moviePercentage}% movies and ${tvShowPercentage}% TV shows, showing a ${moviePercentage > tvShowPercentage ? 'preference for movies' : 'growing focus on series content'}.`;
+            }
+            
+            // Year insight
+            if (data.years.labels.length > 0) {
+                const recentYears = data.years.labels.slice(-5);
+                const recentValues = data.years.values.slice(-5);
+                const totalRecent = recentValues.reduce((a, b) => a + b, 0);
+                const totalAll = data.years.values.reduce((a, b) => a + b, 0);
+                const recentPercentage = ((totalRecent / totalAll) * 100).toFixed(1);
+                
+                document.getElementById('year-insight').textContent = 
+                    `${recentPercentage}% of Netflix content was released in the last 5 years, highlighting their focus on recent productions.`;
+            }
+            
+            // Genre insight
+            if (data.genres.labels.length > 0) {
+                const topGenre = data.genres.labels[0];
+                const secondGenre = data.genres.labels[1];
+                
+                document.getElementById('genre-insight').textContent = 
+                    `"${topGenre}" and "${secondGenre}" are the most common genres in Netflix's library, reflecting popular viewing preferences.`;
+            }
+            
+            // Ratings insight
+            if (data.ratings.labels.length > 0) {
+                const topRating = data.ratings.labels[0];
+                const topRatingCount = data.ratings.values[0];
+                const totalRatings = data.ratings.values.reduce((a, b) => a + b, 0);
+                const topRatingPercentage = ((topRatingCount / totalRatings) * 100).toFixed(1);
+                
+                document.getElementById('ratings-insight').textContent = 
+                    `${topRatingPercentage}% of Netflix content is rated "${topRating}", indicating the platform's target demographic.`;
+            }
+            
+            // Country insight
+            if (data.countries.labels.length > 0) {
+                const topCountry = data.countries.labels[0];
+                const topCountryValue = data.countries.values[0];
+                const totalCountryValues = data.countries.values.reduce((a, b) => a + b, 0);
+                const topCountryPercentage = ((topCountryValue / totalCountryValues) * 100).toFixed(1);
+                
+                document.getElementById('country-insight').textContent = 
+                    `${topCountryPercentage}% of Netflix content comes from ${topCountry}, but the platform continues to expand its international offerings.`;
+            }
+        }
+        
+        // Chart creation functions
+        function createContentTypeChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: ['#E50914', '#564D4D'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif",
+                                    size: 12
+                                },
+                                padding: 20
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 13
+                            },
+                            padding: 15,
+                            cornerRadius: 5,
+                            displayColors: false
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createYearChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Content Added',
+                        data: data.values,
+                        borderColor: '#E50914',
+                        backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointBackgroundColor: '#E50914',
+                        pointBorderColor: '#fff',
+                        pointBorderWidth: 2,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 13
+                            },
+                            padding: 15,
+                            cornerRadius: 5
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif"
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createGenreChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: [
+                            '#E50914', '#B20710', '#831010', 
+                            '#6D0F0E', '#560C0B', '#3F0908',
+                            '#2B0605', '#170303'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif",
+                                    size: 11
+                                },
+                                padding: 15,
+                                boxWidth: 15
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 13
+                            },
+                            padding: 15,
+                            cornerRadius: 5
+                        }
+                    },
+                    scales: {
+                        r: {
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                backdropColor: 'transparent',
+                                font: {
+                                    family: "'Montserrat', sans-serif",
+                                    size: 10
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createRatingsChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Content Rating Distribution',
+                        data: data.values,
+                        backgroundColor: '#E50914',
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 13
+                            },
+                            padding: 15,
+                            cornerRadius: 5
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif"}
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif"
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createCountryChart(containerId, data) {
+            const container = document.getElementById(containerId);
+            const canvas = document.createElement('canvas');
+            container.appendChild(canvas);
+            
+            const ctx = canvas.getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Number of Titles',
+                        data: data.values,
+                        backgroundColor: '#E50914',
+                        borderWidth: 0,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            titleFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                family: "'Montserrat', sans-serif",
+                                size: 13
+                            },
+                            padding: 15,
+                            cornerRadius: 5
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif"
+                                }
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#ffffff',
+                                font: {
+                                    family: "'Montserrat', sans-serif"
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>

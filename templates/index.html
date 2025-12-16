@@ -1,0 +1,1032 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Intelligent Netflix Recommender</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+        :root {
+            --netflix-red: #E50914;
+            --netflix-red-hover: #B20710;
+            --netflix-dark: #141414;
+            --netflix-gray: #282828;
+            --netflix-light-gray: #6D6D6E;
+        }
+
+        body {
+            background-color: var(--netflix-dark);
+            color: #ffffff;
+            font-family: 'Montserrat', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .navbar {
+            background-color: rgba(0, 0, 0, 0.9);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+            padding: 15px 0;
+        }
+
+        .navbar-brand {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 2.2rem;
+            color: var(--netflix-red);
+            letter-spacing: 1px;
+        }
+
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('https://assets.nflxext.com/ffe/siteui/vlv3/ab4b0b22-2ddf-4d48-ae88-c201ae0267e2/0efe6360-7c16-459a-98c4-87ce25b1a27d/US-en-20231030-popsignuptwoweeks-perspective_alpha_website_large.jpg');
+            background-size: cover;
+            background-position: center;
+            padding: 80px 0;
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .hero-content {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero-title {
+            font-family: 'Bebas Neue', sans-serif;
+            font-size: 3.5rem;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-subtitle {
+            font-size: 1.4rem;
+            margin-bottom: 30px;
+            font-weight: 300;
+        }
+
+        .nav-tabs {
+            border-bottom: 1px solid var(--netflix-gray);
+            margin-bottom: 30px;
+            justify-content: center;
+        }
+
+        .nav-tabs .nav-link {
+            color: var(--netflix-light-gray);
+            border: none;
+            border-bottom: 3px solid transparent;
+            border-radius: 0;
+            padding: 12px 25px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 0 5px;
+        }
+
+        .nav-tabs .nav-link:hover {
+            color: #ffffff;
+            background-color: transparent;
+            border-bottom: 3px solid rgba(229, 9, 20, 0.5);
+        }
+
+        .nav-tabs .nav-link.active {
+            color: #ffffff;
+            background-color: transparent;
+            border-bottom: 3px solid var(--netflix-red);
+        }
+
+        .tab-icon {
+            margin-right: 8px;
+        }
+
+        .card {
+            background-color: var(--netflix-gray);
+            border: none;
+            border-radius: 8px;
+            overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            margin-bottom: 30px;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            background-color: rgba(0, 0, 0, 0.4);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 20px;
+        }
+
+        .card-body {
+            padding: 25px;
+        }
+
+        .recommendation-form {
+            background-color: rgba(40, 40, 40, 0.7);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .form-select, .form-control {
+            background-color: var(--netflix-gray);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            padding: 12px 15px;
+            border-radius: 5px;
+        }
+
+        .form-select:focus, .form-control:focus {
+            background-color: var(--netflix-gray);
+            border-color: rgba(229, 9, 20, 0.5);
+            box-shadow: 0 0 0 0.25rem rgba(229, 9, 20, 0.25);
+            color: #fff;
+        }
+
+        .form-select option {
+            background-color: var(--netflix-dark);
+            color: #fff;
+        }
+
+        .btn-netflix {
+            background-color: var(--netflix-red);
+            border: none;
+            color: white;
+            padding: 12px 24px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-netflix:hover {
+            background-color: var(--netflix-red-hover);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            padding-top: 20px;
+        }
+
+        .section-title {
+            font-family: 'Bebas Neue', sans-serif;
+            margin-bottom: 25px;
+            font-size: 2.2rem;
+            position: relative;
+            display: inline-block;
+        }
+
+        .section-title:after {
+            content: '';
+            position: absolute;
+            left: 0;
+            bottom: -10px;
+            width: 50px;
+            height: 3px;
+            background-color: var(--netflix-red);
+        }
+
+        .section-description {
+            color: var(--netflix-light-gray);
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+
+        footer {
+            background-color: rgba(0, 0, 0, 0.9);
+            padding: 30px 0;
+            margin-top: 50px;
+            text-align: center;
+            color: var(--netflix-light-gray);
+        }
+
+        .footer-links {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .footer-links li {
+            margin: 0 15px;
+        }
+
+        .footer-links a {
+            color: var(--netflix-light-gray);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #fff;
+        }
+
+        .chart-container {
+            position: relative;
+            margin: 20px auto;
+            height: 400px;
+            width: 100%;
+        }
+
+        /* Animated gradient background for loading states */
+        .loading-gradient {
+            background: linear-gradient(270deg, #282828, #1a1a1a, #141414);
+            background-size: 600% 600%;
+            animation: loadingAnimation 2s ease infinite;
+        }
+
+        @keyframes loadingAnimation {
+            0% {background-position: 0% 50%;}
+            50% {background-position: 100% 50%;}
+            100% {background-position: 0% 50%;}
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">NETRECOMMEND</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/analytics">Analytics</a>
+                    </li>
+                    
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+  
+    <!-- Main Content -->
+    <div class="container" id="recommendation-section">
+        <ul class="nav nav-tabs" id="recommendationTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="similar-tab" data-bs-toggle="tab" data-bs-target="#similar" type="button" role="tab">
+                    <i class="fas fa-film tab-icon"></i> Similar Shows
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="genre-tab" data-bs-toggle="tab" data-bs-target="#genre" type="button" role="tab">
+                    <i class="fas fa-theater-masks tab-icon"></i> By Genre
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="actor-tab" data-bs-toggle="tab" data-bs-target="#actor" type="button" role="tab">
+                    <i class="fas fa-user-alt tab-icon"></i> By Actor
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="collaborative-tab" data-bs-toggle="tab" data-bs-target="#collaborative" type="button" role="tab">
+                    <i class="fas fa-users tab-icon"></i> Collaborative
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="hybrid-tab" data-bs-toggle="tab" data-bs-target="#hybrid" type="button" role="tab">
+                    <i class="fas fa-magic tab-icon"></i> Hybrid AI
+                </button>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="recommendationTabContent">
+            <!-- Similar Shows Tab -->
+            <div class="tab-pane fade show active" id="similar" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="recommendation-form">
+                            <h3 class="section-title">Find Similar Shows</h3>
+                            <p class="section-description">Select a show you enjoyed, and our AI will find something similar based on content, style, and themes.</p>
+                            <form action="/recommend_similar" method="post">
+                                <div class="mb-4">
+                                    <label for="title" class="form-label">Select a show</label>
+                                    <select class="form-select" id="title" name="title" required>
+                                        <option value="" selected disabled>Choose a show</option>
+                                        {% for title in titles %}
+                                        <option value="{{ title }}">{{ title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-netflix">
+                                        <i class="fas fa-magic me-2"></i> Get Recommendations
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- By Genre Tab -->
+            <div class="tab-pane fade" id="genre" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="recommendation-form">
+                            <h3 class="section-title">Find Shows by Genre</h3>
+                            <p class="section-description">Discover the newest and highest-rated shows in your favorite genre category.</p>
+                            <form action="/recommend_genre" method="post">
+                                <div class="mb-4">
+                                    <label for="genre" class="form-label">Select a genre</label>
+                                    <select class="form-select" id="genre" name="genre" required>
+                                        <option value="" selected disabled>Choose a genre</option>
+                                        {% for genre in genres %}
+                                        <option value="{{ genre }}">{{ genre }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-netflix">
+                                        <i class="fas fa-filter me-2"></i> Get Recommendations
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- By Actor Tab -->
+            <div class="tab-pane fade" id="actor" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="recommendation-form">
+                            <h3 class="section-title">Find Shows by Actor</h3>
+                            <p class="section-description">Enter your favorite actor or actress to discover their best performances on Netflix.</p>
+                            <form action="/recommend_actor" method="post">
+                                <div class="mb-4">
+                                    <label for="actor" class="form-label">Actor/Actress Name</label>
+                                    <input type="text" class="form-control" id="actor" name="actor" placeholder="Enter name (e.g., Jennifer Aniston, Leonardo DiCaprio)" required>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-netflix">
+                                        <i class="fas fa-user-check me-2"></i> Get Recommendations
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Collaborative Filtering Tab -->
+            <div class="tab-pane fade" id="collaborative" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="recommendation-form">
+                            <h3 class="section-title">Collaborative Filtering</h3>
+                            <p class="section-description">Get personalized recommendations based on user behavior patterns and preferences.</p>
+                            <form action="/recommend_collaborative" method="post">
+                                <div class="mb-4">
+                                    <label for="user_id" class="form-label">User ID</label>
+                                    <input type="number" class="form-control" id="user_id" name="user_id" placeholder="Enter User ID (1-1000)" min="1" max="1000" required>
+                                    <div class="form-text text-light">Demo users available: 1-1000</div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="cf_type" class="form-label">Recommendation Method</label>
+                                    <select class="form-select" id="cf_type" name="cf_type" required>
+                                        <option value="user_based">User-Based Collaborative Filtering</option>
+                                        <option value="item_based">Item-Based Collaborative Filtering</option>
+                                        <option value="matrix_factorization">Matrix Factorization (SVD)</option>
+                                    </select>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-netflix">
+                                        <i class="fas fa-users me-2"></i> Get CF Recommendations
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hybrid AI Tab -->
+            <div class="tab-pane fade" id="hybrid" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-8 offset-md-2">
+                        <div class="recommendation-form">
+                            <h3 class="section-title">Hybrid AI Recommendations</h3>
+                            <p class="section-description">Advanced AI combining content analysis and user behavior for ultra-personalized suggestions.</p>
+                            <form action="/recommend_hybrid" method="post">
+                                <div class="mb-4">
+                                    <label for="hybrid_user_id" class="form-label">User ID (Optional)</label>
+                                    <input type="number" class="form-control" id="hybrid_user_id" name="user_id" placeholder="Enter User ID (1-1000)" min="1" max="1000">
+                                    <div class="form-text text-light">Leave empty for content-only recommendations</div>
+                                </div>
+                                <div class="mb-4">
+                                    <label for="hybrid_title" class="form-label">Similar to Show (Optional)</label>
+                                    <select class="form-select" id="hybrid_title" name="title">
+                                        <option value="">No specific show</option>
+                                        {% for title in titles %}
+                                        <option value="{{ title }}">{{ title }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="d-grid">
+                                    <button type="submit" class="btn btn-netflix">
+                                        <i class="fas fa-magic me-2"></i> Get Hybrid Recommendations
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div class="tab-pane fade" id="analytics" role="tabpanel">
+                <div class="row">
+                    <div class="col-12">
+                        <h3 class="section-title">Netflix Content Analytics</h3>
+                        <p class="section-description">Explore insights and visualizations about Netflix's content library.</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-chart-pie me-2"></i> Content Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="contentTypeChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-globe-americas me-2"></i> Content by Country</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="countryChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-calendar-alt me-2"></i> Content by Release Year</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="yearChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-tags me-2"></i> Top Genres</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container">
+                                    <canvas id="genreChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5><i class="fas fa-database me-2"></i> Content Ratings Distribution</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="chart-container" style="height: 300px;">
+                                    <canvas id="ratingsChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="row">
+                <div class="col-12">
+                  
+                    <ul class="footer-links">
+                        <li><a href="/">Home</a></li>
+                        <li><a href="/analytics">Analytics</a></li>
+                      
+                        <li><a href="#">Privacy Policy</a></li>
+                    </ul>
+                    <p class="bold">Project by: Muhammad Hammad Alamgir & Shahzaib Latif</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelector(this.getAttribute('href')).scrollIntoView({
+                        behavior: 'smooth'
+                    });
+                });
+            });
+
+            // Analytics charts - this will be populated with real data from the backend
+            fetch('/api/analytics')
+                .then(response => response.json())
+                .then(data => {
+                    createContentTypeChart(data.contentTypes);
+                    createCountryChart(data.countries);
+                    createYearChart(data.years);
+                    createGenreChart(data.genres);
+                    createRatingsChart(data.ratings);
+                })
+                .catch(error => {
+                    console.error('Error fetching analytics data:', error);
+                    // Fallback to sample data if API fails
+                    createSampleCharts();
+                });
+        });
+
+        // Sample chart data if API fails
+        function createSampleCharts() {
+            // Content Type Chart
+            const ctxType = document.getElementById('contentTypeChart').getContext('2d');
+            const contentTypeChart = new Chart(ctxType, {
+                type: 'pie',
+                data: {
+                    labels: ['Movies', 'TV Shows'],
+                    datasets: [{
+                        data: [70, 30],
+                        backgroundColor: ['#E50914', '#564D4D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Country Chart
+            const ctxCountry = document.getElementById('countryChart').getContext('2d');
+            const countryChart = new Chart(ctxCountry, {
+                type: 'bar',
+                data: {
+                    labels: ['United States', 'India', 'United Kingdom', 'Japan', 'South Korea'],
+                    datasets: [{
+                        label: 'Number of Titles',
+                        data: [2000, 800, 600, 400, 300],
+                        backgroundColor: '#E50914'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Year Chart
+            const ctxYear = document.getElementById('yearChart').getContext('2d');
+            const yearChart = new Chart(ctxYear, {
+                type: 'line',
+                data: {
+                    labels: ['2016', '2017', '2018', '2019', '2020', '2021', '2022', '2023', '2024'],
+                    datasets: [{
+                        label: 'Content Added',
+                        data: [200, 350, 500, 800, 1200, 1500, 1800, 2000, 2200],
+                        borderColor: '#E50914',
+                        backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Genre Chart
+            const ctxGenre = document.getElementById('genreChart').getContext('2d');
+            const genreChart = new Chart(ctxGenre, {
+                type: 'polarArea',
+                data: {
+                    labels: ['Drama', 'Comedy', 'Action', 'Documentary', 'Horror', 'Sci-Fi'],
+                    datasets: [{
+                        data: [1200, 900, 700, 500, 400, 300],
+                        backgroundColor: [
+                            '#E50914', '#B20710', '#831010', 
+                            '#6D0F0E', '#560C0B', '#3F0908'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Ratings Chart
+            const ctxRatings = document.getElementById('ratingsChart').getContext('2d');
+            const ratingsChart = new Chart(ctxRatings, {
+                type: 'bar',
+                                        data: {
+                    labels: ['TV-MA', 'TV-14', 'R', 'PG-13', 'TV-PG', 'TV-Y7', 'G', 'PG'],
+                    datasets: [{
+                        label: 'Content Rating Distribution',
+                        data: [1800, 1400, 1000, 800, 600, 400, 300, 200],
+                        backgroundColor: '#E50914'
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Functions to create charts with actual data
+        function createContentTypeChart(data) {
+            const ctx = document.getElementById('contentTypeChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: ['#E50914', '#564D4D']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createCountryChart(data) {
+            const ctx = document.getElementById('countryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Number of Titles',
+                        data: data.values,
+                        backgroundColor: '#E50914'
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createYearChart(data) {
+            const ctx = document.getElementById('yearChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Content Added',
+                        data: data.values,
+                        borderColor: '#E50914',
+                        backgroundColor: 'rgba(229, 9, 20, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createGenreChart(data) {
+            const ctx = document.getElementById('genreChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'polarArea',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: [
+                            '#E50914', '#B20710', '#831010', 
+                            '#6D0F0E', '#560C0B', '#3F0908',
+                            '#2B0605', '#170303'
+                        ]
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createRatingsChart(data) {
+            const ctx = document.getElementById('ratingsChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        label: 'Content Rating Distribution',
+                        data: data.values,
+                        backgroundColor: '#E50914'
+                    }]
+                },
+                options: {
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        },
+                        y: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#ffffff'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+</html>
+
+<!-- templates/results.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recommendation Results</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #141414;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+        }
+        .header {
+            background-color: #E50914;
+            padding: 20px 0;
+            margin-bottom: 30px;
+        }
+        .recommendation-card {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #E50914;
+        }
+        .recommendation-type {
+            color: #E50914;
+            font-weight: bold;
+        }
+        .btn-netflix {
+            background-color: #E50914;
+            border: none;
+            color: white;
+        }
+        .btn-netflix:hover {
+            background-color: #B20710;
+            color: white;
+        }
+        .no-results {
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 5px;
+            padding: 25px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- <div class="header text-center">
+        <h1>Netflix Show Recommender</h1>
+        <p>Your Personalized Recommendations</p>
+    </div> -->
+
+    <!-- <div class="container">
+        {% if recommendation_type == 'similar' %}
+            <h2>Shows similar to <span class="recommendation-type">"{{ query }}"</span></h2>
+        {% elif recommendation_type == 'genre' %}
+            <h2>Top shows in the <span class="recommendation-type">"{{ query }}"</span> genre</h2>
+        {% elif recommendation_type == 'actor' %}
+            <h2>Shows featuring <span class="recommendation-type">"{{ query }}"</span></h2>
+        {% endif %}
+
+        {% if not recommendations %}
+            <div class="no-results">
+                <h3>No recommendations found</h3>
+                <p>We couldn't find any matching recommendations. Try a different query.</p>
+            </div>
+        {% else %}
+            <div class="row">
+                {% for rec in recommendations %}
+                    <div class="col-md-6">
+                        <div class="recommendation-card">
+                            <h3>{{ rec.title }}</h3>
+                            <div class="d-flex justify-content-between">
+                                <span class="badge bg-secondary">{{ rec.type }}</span>
+                                <span class="badge bg-dark">{{ rec.release_year }}</span>
+                            </div>
+                            <hr>
+                            <p><strong>Genres:</strong> {{ rec.listed_in }}</p>
+                            
+                            {% if recommendation_type == 'actor' %}
+                                <p><strong>Cast:</strong> {{ rec.cast }}</p>
+                            {% else %}
+                                <p><strong>Description:</strong> {{ rec.description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="text-center mt-4 mb-5">
+            <a href="/" class="btn btn-netflix">Back to Recommendations</a>
+        </div>
+    </div> -->
+</body>
+</html>
